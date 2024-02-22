@@ -8,16 +8,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -31,9 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color.Companion.Transparent
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,8 +37,6 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.pineapple.weather.ui.screens.LocationsScreen
-import com.pineapple.weather.ui.screens.ProfileScreen
 import com.pineapple.weather.ui.theme.WeatherTheme
 
 interface WeatherDestination {
@@ -57,14 +50,14 @@ object Locations: WeatherDestination {
     override val text = "Current Location"
     override val icon = Icons.Default.LocationOn
     override val route = "LocationScreen"
-    override val screen: @Composable () -> Unit = { LocationsScreen() }
+    override val screen: @Composable () -> Unit = { }
 }
 
 object Profile: WeatherDestination {
     override val text = "Saved Locations"
     override val icon = Icons.Default.Favorite
     override val route = "ProfileScreen"
-    override val screen: @Composable () -> Unit = { ProfileScreen() }
+    override val screen: @Composable () -> Unit = { }
 }
 
 val navBarItems = listOf(Locations, Profile)

@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.pineapple.weather.data.mappers.WeatherMapper
+import com.pineapple.weather.data.viewmodels.LocationUiState
 import com.pineapple.weather.ui.components.WeatherCard
 
 @Composable
-fun ProfileScreen(){
+fun ProfileScreen(locationUiState: LocationUiState){
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -27,13 +29,17 @@ fun ProfileScreen(){
             ),
         color = Color.Transparent
     ){
-        Column() {
-            WeatherCard()
-            WeatherCard()
-            WeatherCard()
-            WeatherCard()
-            WeatherCard()
-            WeatherCard()
+        when(locationUiState){
+            is LocationUiState.Loading -> Column() {
+                Text("loading...")
+            }
+            is LocationUiState.Success -> Column {
+                val quickSnapshot = WeatherMapper().mapToQuickSnapshot(locationUiState)
+                WeatherCard(quickSnapshot)
+            }
+            is LocationUiState.Error -> Column {
+                Text(text = "Error State")
+            }
         }
     }
 }
