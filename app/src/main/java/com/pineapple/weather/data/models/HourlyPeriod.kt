@@ -1,6 +1,7 @@
 package com.pineapple.weather.data.models
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.datetime.LocalDateTime
 
 data class HourlyPeriod(
     @SerializedName("number")
@@ -9,11 +10,11 @@ data class HourlyPeriod(
     @SerializedName("name")
     val name: String?,
 
-//    @SerializedName("startTime")
-//    val startTime: DateTime?,
-//
-//    @SerializedName("endTime")
-//    val endTime: DateTime?,
+    @SerializedName("startTime")
+    val startTime: String?,
+
+    @SerializedName("endTime")
+    val endTime: String?,
 
     @SerializedName("isDaytime")
     val isDaytime: Boolean?,

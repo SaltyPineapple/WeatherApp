@@ -1,6 +1,7 @@
 package com.pineapple.weather.data.models
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.datetime.LocalDateTime
 import java.util.Date
 
 data class BiDailyPeriod(
@@ -10,11 +11,11 @@ data class BiDailyPeriod(
     @SerializedName("name")
     val name: String?,
 
-/*    @SerializedName("endTime")
-    val endTime: Date,
+    @SerializedName("endTime")
+    val endTime: String?,
 
     @SerializedName("startTime")
-    val startTime: Date,*/
+    val startTime: String?,
 
     @SerializedName("isDaytime")
     val isDaytime: Boolean?,
