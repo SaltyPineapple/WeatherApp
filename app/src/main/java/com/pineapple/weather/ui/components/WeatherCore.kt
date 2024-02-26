@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,7 +27,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,15 +34,13 @@ import com.pineapple.weather.R
 import com.pineapple.weather.data.mappers.WeatherMapper
 import com.pineapple.weather.data.models.BiDailyPeriod
 import com.pineapple.weather.data.models.BiDailySnapshot
+import com.pineapple.weather.data.models.DailySnapshot
 import com.pineapple.weather.data.models.HourlyPeriod
 import com.pineapple.weather.data.models.HourlySnapshot
 import com.pineapple.weather.data.models.QuickSnapshot
 import com.pineapple.weather.ui.theme.WeatherTheme
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAccessor
 import java.util.Locale
 
 @Composable
@@ -130,12 +128,11 @@ fun WeatherCoreHourly(hourlyPeriods: List<HourlyPeriod>, detailedForecastDaily: 
 
 @Composable
 fun HourlySnapshotItem(hourlySnapshot: HourlySnapshot) {
-    // val formatter = LocalDateTimeFormatter.ofPattern("h a")
-    val timezone = java.util.TimeZone.getDefault()
+    val formatter = DateTimeFormatter.ofPattern("h a")
     Column(modifier = Modifier
-        .width(60.dp)
+        .width(70.dp)
         .padding(5.dp)) {
-        Text(text = hourlySnapshot.time.hour.toString(), textAlign = TextAlign.Center, modifier = Modifier
+        Text(text = hourlySnapshot.time.format(formatter), textAlign = TextAlign.Center, modifier = Modifier
             .fillMaxWidth()
             .padding(5.dp))
         Image(painter = painterResource(id = hourlySnapshot.weatherImage),
@@ -163,14 +160,11 @@ fun HourlySnapshotItem(hourlySnapshot: HourlySnapshot) {
 }
 
 @Composable
-fun WeatherCoreBiDaily(bidailyPeriods: List<BiDailyPeriod>) {
-    var biDailyList = mutableListOf<BiDailySnapshot>()
-    for (period in bidailyPeriods)
-        biDailyList.add(WeatherMapper().mapToBiDailySnapshot(period))
+fun WeatherCoreDaily(biDailyPeriods: List<BiDailyPeriod>) {
+    val dailyList = WeatherMapper().mapToDailySnapshots(biDailyPeriods)
 
     Card(
         modifier = Modifier
-//            .size(width = LocalConfiguration.current.screenWidthDp.dp - 5.dp, height = 100.dp)
             .padding(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
@@ -179,7 +173,7 @@ fun WeatherCoreBiDaily(bidailyPeriods: List<BiDailyPeriod>) {
     ) {
         LazyColumn {
             items(7) {index ->
-                DailySnapshotItem(biDailySnapshot = biDailyList[index])
+                DailySnapshotItem(dailySnapshot = dailyList[index])
             }
         }
     }
@@ -187,22 +181,40 @@ fun WeatherCoreBiDaily(bidailyPeriods: List<BiDailyPeriod>) {
 }
 
 @Composable
-fun DailySnapshotItem(biDailySnapshot: BiDailySnapshot) {
-    Row {
-        Text(text = biDailySnapshot.time.dayOfWeek.name.lowercase(Locale.getDefault()).replaceFirstChar { it.uppercase() })
-        Icon(painter = painterResource(biDailySnapshot.precipitationIcon),
+fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
+    Row(modifier = Modifier.size(width = LocalConfiguration.current.screenWidthDp.dp - 5.dp, height = 30.dp).fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically) {
+
+        Text(text = dailySnapshot.day.name.lowercase(Locale.getDefault()).replaceFirstChar { it.uppercase() },
+            modifier = Modifier.padding(start = 16.dp, end = 40.dp))
+
+        Icon(painter = painterResource(dailySnapshot.precipitationIcon),
             modifier = Modifier
                 .size(16.dp)
-                .weight(0.2f),
+                .width(20.dp),
             contentDescription = "precipitation icon")
-        Text(text = "${biDailySnapshot.probabilityOfPrecipitation}%", fontSize = 12.sp)
-        Image(painter = painterResource(id = biDailySnapshot.weatherImage),
+
+        Text(text = "${dailySnapshot.probabilityOfPrecipitation}%", fontSize = 12.sp)
+
+        Image(painter = painterResource(id = dailySnapshot.morningImage),
             contentDescription = "Hourly Weather Icon",
             alignment = Alignment.Center,
             contentScale = ContentScale.Inside,
             modifier = Modifier
-                .fillMaxWidth()
-                .size(25.dp))
+                .size(25.dp)
+                .padding(start = 16.dp, end = 4.dp))
+
+        Image(painter = painterResource(id = dailySnapshot.eveningImage),
+            contentDescription = "Hourly Weather Icon",
+            alignment = Alignment.Center,
+            contentScale = ContentScale.Inside,
+            modifier = Modifier
+                .size(25.dp)
+                .padding(start = 16.dp, end = 4.dp))
+
+        Text(text = "${dailySnapshot.morningTemperature}°")
+
+        Text(text = "${dailySnapshot.eveningTemperature}°")
     }
 }
 
@@ -238,7 +250,7 @@ fun WeatherCorePreview(){
 @Composable
 fun HourlySnapshotItemPreview(){
     val hourlySnapshot = HourlySnapshot(
-        time = LocalDateTime.parse("2024-02-23T01:00:00-05:00"),
+        time = ZonedDateTime.now(),
         temperature = 56,
         weatherImage = R.drawable.cloudy_night,
         precipitationProbability = 70,
@@ -253,29 +265,17 @@ fun HourlySnapshotItemPreview(){
 @Preview
 @Composable
 fun DailySnapshotItem(){
-    val firstBiDailySnapshot = BiDailySnapshot(
-        time = LocalDateTime(2024, 10, 3, 12, 0, 0),
-        name = "Tuesday Morning",
-        isDaytime = true,
-        temperature = 76,
+    val dailySnapshot = DailySnapshot(
+        day = ZonedDateTime.now().dayOfWeek,
+        morningTemperature = 76,
+        eveningTemperature = 68,
         probabilityOfPrecipitation = 10,
         precipitationIcon = R.drawable.water_low,
-        shortForecast = "Mostly Clear",
-        weatherImage = R.drawable.cloudy_day
+        morningImage = R.drawable.clear_day,
+        eveningImage = R.drawable.clear_night
     )
 
-    val secondBiDailySnapshot = BiDailySnapshot(
-        time = LocalDateTime(2024, 10, 3, 18, 0, 0),
-        name = "Tuesday Morning",
-        isDaytime = true,
-        temperature = 76,
-        probabilityOfPrecipitation = 10,
-        precipitationIcon = R.drawable.water_low,
-        shortForecast = "Mostly Clear",
-        weatherImage = R.drawable.cloudy_night
-    )
-    
     WeatherTheme {
-        DailySnapshotItem(biDailySnapshot = firstBiDailySnapshot)
+        DailySnapshotItem(dailySnapshot = dailySnapshot)
     }
 }

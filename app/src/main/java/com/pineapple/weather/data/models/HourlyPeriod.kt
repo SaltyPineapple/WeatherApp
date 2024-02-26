@@ -1,7 +1,6 @@
 package com.pineapple.weather.data.models
 
 import com.google.gson.annotations.SerializedName
-import kotlinx.datetime.LocalDateTime
 
 data class HourlyPeriod(
     @SerializedName("number")

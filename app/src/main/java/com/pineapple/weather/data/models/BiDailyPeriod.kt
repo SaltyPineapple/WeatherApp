@@ -1,8 +1,6 @@
 package com.pineapple.weather.data.models
 
 import com.google.gson.annotations.SerializedName
-import kotlinx.datetime.LocalDateTime
-import java.util.Date
 
 data class BiDailyPeriod(
     @SerializedName("number")

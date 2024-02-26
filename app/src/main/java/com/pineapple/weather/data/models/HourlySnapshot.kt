@@ -1,9 +1,9 @@
 package com.pineapple.weather.data.models
 
-import kotlinx.datetime.LocalDateTime
+import java.time.ZonedDateTime
 
 data class HourlySnapshot (
-    val time: LocalDateTime,
+    val time: ZonedDateTime,
     val temperature: Int,
     val weatherImage: Int,
     val precipitationProbability: Int,

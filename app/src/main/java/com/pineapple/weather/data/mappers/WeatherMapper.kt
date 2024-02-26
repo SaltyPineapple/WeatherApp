@@ -1,5 +1,6 @@
 package com.pineapple.weather.data.mappers
 
+import android.util.Log
 import com.pineapple.weather.R
 import com.pineapple.weather.data.models.BiDailyPeriod
 import com.pineapple.weather.data.models.BiDailySnapshot
@@ -9,7 +10,12 @@ import com.pineapple.weather.data.models.HourlyPeriod
 import com.pineapple.weather.data.models.HourlySnapshot
 import com.pineapple.weather.data.models.QuickSnapshot
 import com.pineapple.weather.data.viewmodels.LocationUiState
-import kotlinx.datetime.LocalDateTime
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.util.logging.LogManager
+import java.util.logging.Logger
 
 class WeatherMapper {
     fun mapToDaily(locationUiState: LocationUiState.Success) : DailyWeather {
@@ -26,20 +32,39 @@ class WeatherMapper {
         )
     }
 
+    fun mapToZonedTime(timeStamp: String) : ZonedDateTime{
+        val localDateTime = LocalDateTime.parse((timeStamp.dropLast(6))) ?: throw IllegalArgumentException("hourly startTime is invalid: ${timeStamp}")
+        return localDateTime.atZone(ZoneId.of("PST"))
+    }
+
     /* TODO:
     * Need to map this to DailySnapshot and combine each of the two biDailySnapshot's into one based on their day
     */
     fun mapToDailySnapshots(biDailyPeriods: List<BiDailyPeriod>) : List<DailySnapshot> {
-        var dailyPeriods = mutableListOf<DailySnapshot>()
-        for (period in biDailyPeriods){
-
+        val dailyPeriods = mutableListOf<DailySnapshot>()
+        val groupedPeriods = biDailyPeriods.groupBy { it.startTime?.let { it1 -> mapToZonedTime(it1).dayOfWeek } }
+        for (period in groupedPeriods){
+            val morning = period.value[0]
+            val evening = period.value[1]
+            val rainChance = morning.probabilityOfPrecipitation?.probability?.plus(evening.probabilityOfPrecipitation?.probability ?: 0)?.div(2)
+            dailyPeriods.add(
+                DailySnapshot(
+                    day = period.key ?: throw IllegalArgumentException("day of week is null"),
+                    morningTemperature = period.value[0].temperature ?: throw IllegalArgumentException("morning temp is null"),
+                    eveningTemperature = period.value[1].temperature ?: throw IllegalArgumentException("evening temp is null"),
+                    probabilityOfPrecipitation = rainChance ?: 0,
+                    precipitationIcon = WeatherImageMapper().mapIcon(rainChance ?: R.drawable.water_low),
+                    morningImage = WeatherImageMapper().map(morning.shortForecast, morning.isDaytime),
+                    eveningImage = WeatherImageMapper().map(evening.shortForecast, evening.isDaytime)
+                )
+            )
         }
         return dailyPeriods
     }
 
     fun mapToBiDailySnapshot(biDailyPeriod: BiDailyPeriod) : BiDailySnapshot {
         return BiDailySnapshot(
-            time = LocalDateTime.parse(biDailyPeriod.startTime?.dropLast(6) ?: "2024-02-23T01:00:00"),
+            time = mapToZonedTime(biDailyPeriod.startTime ?: throw IllegalArgumentException("biDailyPeriodStartTime cannot be null")),
             name = biDailyPeriod.name ?: "",
             isDaytime = biDailyPeriod.isDaytime ?: true,
             temperature = biDailyPeriod.temperature ?: 0,
@@ -52,7 +77,7 @@ class WeatherMapper {
 
     fun mapToHourlySnapshot(hourlyPeriod: HourlyPeriod) : HourlySnapshot{
         return HourlySnapshot(
-            time = LocalDateTime.parse(hourlyPeriod.startTime?.dropLast(6) ?: "2024-02-23T01:00:00"),
+            time = mapToZonedTime(hourlyPeriod.startTime ?: throw IllegalArgumentException("hourlyPeriod startTime cannot be null")),
             temperature = hourlyPeriod.temperature ?: 0,
             weatherImage = WeatherImageMapper().map(hourlyPeriod.shortForecast, hourlyPeriod.isDaytime),
             precipitationProbability = hourlyPeriod.probabilityOfPrecipitation?.probability ?: 0,

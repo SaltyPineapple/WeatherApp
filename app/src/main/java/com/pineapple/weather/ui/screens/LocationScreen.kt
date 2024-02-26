@@ -11,12 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.pineapple.weather.data.mappers.WeatherMapper
-import com.pineapple.weather.data.models.HourlyPeriod
 import com.pineapple.weather.data.viewmodels.LocationUiState
 import com.pineapple.weather.ui.components.LocationHeader
-import com.pineapple.weather.ui.components.WeatherCard
 import com.pineapple.weather.ui.components.WeatherCore
-import com.pineapple.weather.ui.components.WeatherCoreBiDaily
+import com.pineapple.weather.ui.components.WeatherCoreDaily
 import com.pineapple.weather.ui.components.WeatherCoreHourly
 
 @Composable
@@ -44,7 +42,7 @@ fun LocationScreen(locationUiState: LocationUiState){
                 WeatherCore(quickSnapshot)
                 WeatherCoreHourly(hourlyPeriods = locationUiState.hourlyForecast.hourlyForecastProperties?.periods ?: emptyList(),
                     detailedForecastDaily = locationUiState.dailyForecast.dailyForecastProperties?.periods?.get(0)?.detailedForecast ?: "Today's Forecast")
-                WeatherCoreBiDaily(bidailyPeriods = locationUiState.dailyForecast.dailyForecastProperties?.periods ?: emptyList())
+                WeatherCoreDaily(biDailyPeriods = locationUiState.dailyForecast.dailyForecastProperties?.periods ?: emptyList())
             }
             is LocationUiState.Error -> Column {
                 Text(text = "Error State")

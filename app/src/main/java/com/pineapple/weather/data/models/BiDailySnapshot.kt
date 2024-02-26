@@ -1,9 +1,9 @@
 package com.pineapple.weather.data.models
 
-import kotlinx.datetime.LocalDateTime
+import java.time.ZonedDateTime
 
 data class BiDailySnapshot(
-    val time: LocalDateTime,
+    val time: ZonedDateTime,
     val name: String,
     val isDaytime: Boolean,
     val temperature: Int,
