@@ -1,6 +1,7 @@
 package com.pineapple.weather.ui
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
@@ -25,6 +26,7 @@ fun WeatherScaffold(
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
         snackbarHost = snackbarHost,
+        contentWindowInsets = WindowInsets(0,0,0,0),
         content = content
     )
 }

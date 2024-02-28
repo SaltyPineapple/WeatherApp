@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,15 +48,12 @@ import java.util.Locale
 fun LocationHeader(locationName: String){
     Row(modifier = Modifier
         .size(width = LocalConfiguration.current.screenWidthDp.dp - 5.dp, height = 80.dp)
-        .padding(horizontal = 24.dp, vertical = 8.dp)) {
+        .padding(horizontal = 24.dp)) {
         Text(text = locationName, fontSize = 40.sp, modifier = Modifier
-            .fillMaxHeight()
             .align(Alignment.CenterVertically))
         Icon(imageVector = Icons.Default.LocationOn,
             contentDescription = "location header",
-            modifier = Modifier
-                .fillMaxHeight()
-                .align(Alignment.CenterVertically))
+            modifier = Modifier.align(Alignment.CenterVertically).size(30.dp))
     }
 }
 
@@ -90,32 +88,21 @@ fun WeatherCore(quickSnapshot: QuickSnapshot) {
 }
 
 @Composable
-fun WeatherCoreHourly(hourlyPeriods: List<HourlyPeriod>, detailedForecastDaily: String) {
+fun WeatherCoreHourly(hourlyPeriods: List<HourlyPeriod>) {
     val hourlySnapshots = mutableListOf<HourlySnapshot>()
     for (period in hourlyPeriods) {
         hourlySnapshots.add(WeatherMapper().mapToHourlySnapshot(period))
     }
 
     Card(
-        modifier = Modifier
-//            .size(width = LocalConfiguration.current.screenWidthDp.dp - 5.dp, height = 100.dp)
-            .padding(8.dp),
+        modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     ) {
-//        Box(modifier = Modifier.background(
-//            Brush.linearGradient(
-//            listOf(
-//                MaterialTheme.colorScheme.primaryContainer,
-//                MaterialTheme.colorScheme.onPrimary
-//            )
-//        ))){
-//
-//        }
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = detailedForecastDaily, modifier = Modifier.padding(8.dp))
+            Text(text = "Hourly Forecast", modifier = Modifier.padding(8.dp))
             Divider(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f), thickness = 1.dp)
             LazyRow{
                 items(16) { index ->
@@ -164,16 +151,19 @@ fun WeatherCoreDaily(biDailyPeriods: List<BiDailyPeriod>) {
     val dailyList = WeatherMapper().mapToDailySnapshots(biDailyPeriods)
 
     Card(
-        modifier = Modifier
-            .padding(8.dp),
+        modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     ) {
-        LazyColumn {
-            items(7) {index ->
-                DailySnapshotItem(dailySnapshot = dailyList[index])
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(text = "Weekly Forecast", modifier = Modifier.padding(8.dp))
+            Divider(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f), thickness = 1.dp)
+            LazyColumn {
+                items(7) {index ->
+                    DailySnapshotItem(dailySnapshot = dailyList[index])
+                }
             }
         }
     }
@@ -182,11 +172,15 @@ fun WeatherCoreDaily(biDailyPeriods: List<BiDailyPeriod>) {
 
 @Composable
 fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
-    Row(modifier = Modifier.size(width = LocalConfiguration.current.screenWidthDp.dp - 5.dp, height = 30.dp).fillMaxWidth(),
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically) {
 
         Text(text = dailySnapshot.day.name.lowercase(Locale.getDefault()).replaceFirstChar { it.uppercase() },
-            modifier = Modifier.padding(start = 16.dp, end = 40.dp))
+            modifier = Modifier.padding(start = 16.dp).width(100.dp))
+
+        Spacer(modifier = Modifier.weight(2f))
 
         Icon(painter = painterResource(dailySnapshot.precipitationIcon),
             modifier = Modifier
@@ -196,13 +190,15 @@ fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
 
         Text(text = "${dailySnapshot.probabilityOfPrecipitation}%", fontSize = 12.sp)
 
+        Spacer(modifier = Modifier.weight(1f))
+
         Image(painter = painterResource(id = dailySnapshot.morningImage),
             contentDescription = "Hourly Weather Icon",
             alignment = Alignment.Center,
             contentScale = ContentScale.Inside,
             modifier = Modifier
                 .size(25.dp)
-                .padding(start = 16.dp, end = 4.dp))
+                .padding(end = 4.dp))
 
         Image(painter = painterResource(id = dailySnapshot.eveningImage),
             contentDescription = "Hourly Weather Icon",
@@ -210,11 +206,13 @@ fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
             contentScale = ContentScale.Inside,
             modifier = Modifier
                 .size(25.dp)
-                .padding(start = 16.dp, end = 4.dp))
+                .padding(start = 4.dp))
 
-        Text(text = "${dailySnapshot.morningTemperature}°")
+        Spacer(modifier = Modifier.weight(1f))
 
-        Text(text = "${dailySnapshot.eveningTemperature}°")
+        Text(text = "${dailySnapshot.morningTemperature}°", modifier = Modifier.padding(end = 8.dp))
+
+        Text(text = "${dailySnapshot.eveningTemperature}°", modifier = Modifier.padding(end = 16.dp))
     }
 }
 
