@@ -33,6 +33,9 @@ data class HourlyPeriod(
     @SerializedName("windDirection")
     val windDirection: String,
 
+    @SerializedName("relativeHumidity")
+    val relativeHumidity: RelativeHumidityProperties,
+
     @SerializedName("shortForecast")
     val shortForecast: String,
 

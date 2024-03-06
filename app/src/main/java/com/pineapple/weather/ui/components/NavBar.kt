@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -66,7 +67,8 @@ val navBarItems = listOf(Locations, Profile)
 fun WeatherNavBar(navController: NavHostController, backStackEntry: State<NavBackStackEntry?>){
     NavigationBar(
         modifier = Modifier
-            .padding(36.dp)
+            .padding(24.dp)
+            .height(75.dp)
             .clip(RoundedCornerShape(15.dp, 15.dp, 15.dp, 15.dp)),
         containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
@@ -91,7 +93,7 @@ fun WeatherNavBar(navController: NavHostController, backStackEntry: State<NavBac
                     Text(
                         text = item.text,
                         fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.alpha(easeOut)
+                        modifier = Modifier.alpha(easeOut).offset(y = (20).dp)
                     )
                 },
                 icon = {

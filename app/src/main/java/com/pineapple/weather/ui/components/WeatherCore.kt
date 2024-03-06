@@ -5,13 +5,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -34,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import com.pineapple.weather.R
 import com.pineapple.weather.data.mappers.WeatherMapper
 import com.pineapple.weather.data.models.BiDailyPeriod
-import com.pineapple.weather.data.models.BiDailySnapshot
+import com.pineapple.weather.data.models.CardInfo
 import com.pineapple.weather.data.models.DailySnapshot
 import com.pineapple.weather.data.models.HourlyPeriod
 import com.pineapple.weather.data.models.HourlySnapshot
@@ -53,7 +50,9 @@ fun LocationHeader(locationName: String){
             .align(Alignment.CenterVertically))
         Icon(imageVector = Icons.Default.LocationOn,
             contentDescription = "location header",
-            modifier = Modifier.align(Alignment.CenterVertically).size(30.dp))
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .size(30.dp))
     }
 }
 
@@ -160,14 +159,13 @@ fun WeatherCoreDaily(biDailyPeriods: List<BiDailyPeriod>) {
         Column(modifier = Modifier.padding(8.dp)) {
             Text(text = "Weekly Forecast", modifier = Modifier.padding(8.dp))
             Divider(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f), thickness = 1.dp)
-            LazyColumn {
-                items(7) {index ->
+            Column {
+                repeat(7) {index ->
                     DailySnapshotItem(dailySnapshot = dailyList[index])
                 }
             }
         }
     }
-
 }
 
 @Composable
@@ -178,7 +176,9 @@ fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
         verticalAlignment = Alignment.CenterVertically) {
 
         Text(text = dailySnapshot.day.name.lowercase(Locale.getDefault()).replaceFirstChar { it.uppercase() },
-            modifier = Modifier.padding(start = 16.dp).width(100.dp))
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .width(100.dp))
 
         Spacer(modifier = Modifier.weight(2f))
 
@@ -213,6 +213,24 @@ fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
         Text(text = "${dailySnapshot.morningTemperature}°", modifier = Modifier.padding(end = 8.dp))
 
         Text(text = "${dailySnapshot.eveningTemperature}°", modifier = Modifier.padding(end = 16.dp))
+    }
+}
+
+@Composable
+fun WeatherInfoCard(cardInfo: CardInfo){
+    Card(modifier = Modifier.padding(8.dp).size(width = (LocalConfiguration.current.screenWidthDp.dp / 2) - 20.dp, height = 100.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        )) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Row(modifier = Modifier.padding(4.dp)){
+                Icon(painterResource(id = cardInfo.icon), contentDescription = "Card Icon")
+                Text(text = cardInfo.title)
+            }
+            Divider(color = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.5f), thickness = 1.dp)
+            Text(text = cardInfo.details, modifier = Modifier.padding(16.dp))
+        }
     }
 }
 
@@ -275,5 +293,14 @@ fun DailySnapshotItem(){
 
     WeatherTheme {
         DailySnapshotItem(dailySnapshot = dailySnapshot)
+    }
+}
+
+@Preview
+@Composable
+fun WeatherCardInfoPreview(){
+    val cardInfo = CardInfo("UV index", "low", R.drawable.water_mid)
+    WeatherTheme {
+        WeatherInfoCard(cardInfo = cardInfo)
     }
 }
