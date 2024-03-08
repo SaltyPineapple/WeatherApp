@@ -87,12 +87,7 @@ fun WeatherCore(quickSnapshot: QuickSnapshot) {
 }
 
 @Composable
-fun WeatherCoreHourly(hourlyPeriods: List<HourlyPeriod>) {
-    val hourlySnapshots = mutableListOf<HourlySnapshot>()
-    for (period in hourlyPeriods) {
-        hourlySnapshots.add(WeatherMapper().mapToHourlySnapshot(period))
-    }
-
+fun WeatherCoreHourly(hourlySnapshots: List<HourlySnapshot>) {
     Card(
         modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(
@@ -146,9 +141,7 @@ fun HourlySnapshotItem(hourlySnapshot: HourlySnapshot) {
 }
 
 @Composable
-fun WeatherCoreDaily(biDailyPeriods: List<BiDailyPeriod>) {
-    val dailyList = WeatherMapper().mapToDailySnapshots(biDailyPeriods)
-
+fun WeatherCoreDaily(dailyList: List<DailySnapshot>) {
     Card(
         modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(
@@ -218,7 +211,7 @@ fun DailySnapshotItem(dailySnapshot: DailySnapshot) {
 
 @Composable
 fun WeatherInfoCard(cardInfo: CardInfo){
-    Card(modifier = Modifier.padding(8.dp).size(width = (LocalConfiguration.current.screenWidthDp.dp / 2) - 20.dp, height = 100.dp),
+    Card(modifier = Modifier.padding(8.dp).size(width = (LocalConfiguration.current.screenWidthDp.dp / 2) - 18.dp, height = 100.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,

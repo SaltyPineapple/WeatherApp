@@ -14,7 +14,7 @@ fun WeatherScaffold(
     topBar: @Composable (() -> Unit) = {},
     bottomBar: @Composable (() -> Unit) = {},
     floatingActionButton: @Composable (() -> Unit) = {},
-    floatingActionButtonPosition: FabPosition = FabPosition.Center,
+    floatingActionButtonPosition: FabPosition = FabPosition.End,
     snackbarHost: @Composable (() -> Unit) = {},
     content: @Composable (PaddingValues) -> Unit,
 ) {

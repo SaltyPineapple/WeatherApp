@@ -1,5 +1,6 @@
 package com.pineapple.weather
 
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -12,10 +13,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -27,6 +32,7 @@ import com.pineapple.weather.data.viewmodels.LocationViewModel
 import com.pineapple.weather.ui.WeatherScaffold
 import com.pineapple.weather.ui.components.Locations
 import com.pineapple.weather.ui.components.Profile
+import com.pineapple.weather.ui.components.Search
 import com.pineapple.weather.ui.components.WeatherNavBar
 import com.pineapple.weather.ui.screens.LocationScreen
 import com.pineapple.weather.ui.screens.ProfileScreen
@@ -51,26 +57,8 @@ fun WeatherApp(){
                 ),
             color = Color.Transparent
         ) {
-            WeatherScaffold(
-                bottomBar = { WeatherNavBar(navController = navController, backStackEntry = backStackEntry) },
-                floatingActionButton = {
-                    FloatingActionButton(
-                        onClick = { /* TODO */ },
-                        modifier = Modifier.size(72.dp).offset(y = (84).dp),
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                        shape = CircleShape
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search Locations",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                },
-            ) {
-                NavGraph(navController = navController)
-            }
+            val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+            LocationScreen(locationViewModel.locationUiState)
         }
     }
 }

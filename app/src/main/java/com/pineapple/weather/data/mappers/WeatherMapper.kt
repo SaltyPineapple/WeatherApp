@@ -37,9 +37,6 @@ class WeatherMapper {
         return localDateTime.atZone(ZoneId.of("PST"))
     }
 
-    /* TODO:
-    * Need to map this to DailySnapshot and combine each of the two biDailySnapshot's into one based on their day
-    */
     fun mapToDailySnapshots(biDailyPeriods: List<BiDailyPeriod>) : List<DailySnapshot> {
         val dailyPeriods = mutableListOf<DailySnapshot>()
         val groupedPeriods = biDailyPeriods.groupBy { it.startTime?.let { it1 -> mapToZonedTime(it1).dayOfWeek } }
@@ -50,8 +47,8 @@ class WeatherMapper {
             dailyPeriods.add(
                 DailySnapshot(
                     day = period.key ?: throw IllegalArgumentException("day of week is null"),
-                    morningTemperature = period.value[0].temperature ?: throw IllegalArgumentException("morning temp is null"),
-                    eveningTemperature = period.value[1].temperature ?: throw IllegalArgumentException("evening temp is null"),
+                    morningTemperature = morning.temperature ?: throw IllegalArgumentException("morning temp is null"),
+                    eveningTemperature = evening.temperature ?: throw IllegalArgumentException("evening temp is null"),
                     probabilityOfPrecipitation = rainChance ?: 0,
                     precipitationIcon = WeatherImageMapper().mapIcon(rainChance ?: R.drawable.water_low),
                     morningImage = WeatherImageMapper().map(morning.shortForecast, morning.isDaytime),
