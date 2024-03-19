@@ -35,7 +35,7 @@ fun ProfileScreen(locationUiState: LocationUiState){
             }
             is LocationUiState.Success -> Column {
                 val quickSnapshot = WeatherMapper().mapToQuickSnapshot(locationUiState)
-                WeatherCard(quickSnapshot)
+                // WeatherCard(quickSnapshot)
             }
             is LocationUiState.Error -> Column {
                 Text(text = "Error State")

@@ -6,8 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.pineapple.weather.data.WeatherApi
 import com.pineapple.weather.data.models.DailyForecast
 import com.pineapple.weather.data.models.HourlyForecast
@@ -22,9 +20,11 @@ sealed interface LocationUiState {
     object Loading : LocationUiState
 }
 
-class LocationViewModel: ViewModel() {
+class LocationViewModel(
+    private val gridpoints: Gridpoints
+): ViewModel() {
     var locationUiState: LocationUiState by mutableStateOf(LocationUiState.Loading)
-    private set
+        private set
 
     init {
         getWeather()
@@ -34,7 +34,8 @@ class LocationViewModel: ViewModel() {
        viewModelScope.launch {
            locationUiState = LocationUiState.Loading
            locationUiState = try {
-               val points = WeatherApi.retrofitService.getPoints(47.5301, -122.0326).body()
+               // points hard coded to Issaquah
+               val points = WeatherApi.retrofitService.getPoints(gridpoints.gridX, gridpoints.gridY).body()
                val dailyForecast = WeatherApi.retrofitService.getForecast(
                    points?.properties?.wfo ?: "LWX",
                    points?.properties?.gridX?.toInt() ?: 0,
@@ -53,7 +54,6 @@ class LocationViewModel: ViewModel() {
                    ),
                    dailyForecast = DailyForecast(dailyForecastProperties = dailyForecast?.dailyForecastProperties),
                    hourlyForecast = HourlyForecast(hourlyForecastProperties = hourlyForecast?.hourlyForecastProperties)
-
                )
            } catch (e: IOException) {
                LocationUiState.Error
@@ -64,9 +64,16 @@ class LocationViewModel: ViewModel() {
    }
 
    companion object{
-       val Factory: ViewModelProvider.Factory = viewModelFactory {
-           initializer {
-                LocationViewModel()
+//       val Factory: ViewModelProvider.Factory = viewModelFactory {
+//           initializer {
+//                LocationViewModel()
+//           }
+//       }
+
+       fun provideFactory(gridpoints: Gridpoints) : ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+           @Suppress("UNCHECKED_CAST")
+           override fun <T : ViewModel> create(modelClass: Class<T>): T {
+               return LocationViewModel(gridpoints) as T
            }
        }
    }

@@ -23,10 +23,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pineapple.weather.R
+import com.pineapple.weather.data.mappers.WeatherMapper
 import com.pineapple.weather.data.models.DailyWeather
 import com.pineapple.weather.data.models.HourlyPeriod
 import com.pineapple.weather.data.models.HourlyWeather
 import com.pineapple.weather.data.models.QuickSnapshot
+import com.pineapple.weather.data.viewmodels.LocationUiState
+import com.pineapple.weather.data.viewmodels.SnapshotUiState
 import com.pineapple.weather.ui.theme.WeatherTheme
 
 @Composable
@@ -38,7 +41,8 @@ fun WeatherCard(quickSnapshot: QuickSnapshot) {
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f),
             contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        )
+        ),
+        onClick = {},
     ) {
         Row(modifier = Modifier.padding(horizontal = 24.dp)) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxHeight()) {
@@ -57,6 +61,7 @@ fun WeatherCard(quickSnapshot: QuickSnapshot) {
                 )
             }
         }
+        // this ui state will not live in the card. This logic will be inside the drawer
     }
 }
 
@@ -75,6 +80,6 @@ fun WeatherCardPreview() {
         R.drawable.cloudy_day
     )
     WeatherTheme {
-        WeatherCard(quickSnapshot)
+        // WeatherCard(quickSnapshot)
     }
 }

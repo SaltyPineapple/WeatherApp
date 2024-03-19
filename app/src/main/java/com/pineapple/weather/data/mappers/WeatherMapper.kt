@@ -6,10 +6,13 @@ import com.pineapple.weather.data.models.BiDailyPeriod
 import com.pineapple.weather.data.models.BiDailySnapshot
 import com.pineapple.weather.data.models.DailySnapshot
 import com.pineapple.weather.data.models.DailyWeather
+import com.pineapple.weather.data.models.HourlyForecast
 import com.pineapple.weather.data.models.HourlyPeriod
 import com.pineapple.weather.data.models.HourlySnapshot
+import com.pineapple.weather.data.models.Points
 import com.pineapple.weather.data.models.QuickSnapshot
 import com.pineapple.weather.data.viewmodels.LocationUiState
+import com.pineapple.weather.data.viewmodels.SnapshotUiState
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -42,7 +45,7 @@ class WeatherMapper {
         val groupedPeriods = biDailyPeriods.groupBy { it.startTime?.let { it1 -> mapToZonedTime(it1).dayOfWeek } }
         for (period in groupedPeriods){
             val morning = period.value[0]
-            val evening = period.value[1]
+            val evening = period.value[0]
             val rainChance = morning.probabilityOfPrecipitation?.probability?.plus(evening.probabilityOfPrecipitation?.probability ?: 0)?.div(2)
             dailyPeriods.add(
                 DailySnapshot(
@@ -79,6 +82,20 @@ class WeatherMapper {
             weatherImage = WeatherImageMapper().map(hourlyPeriod.shortForecast, hourlyPeriod.isDaytime),
             precipitationProbability = hourlyPeriod.probabilityOfPrecipitation?.probability ?: 0,
             precipitationIcon = WeatherImageMapper().mapIcon(hourlyPeriod.probabilityOfPrecipitation?.probability ?: R.drawable.water_low)
+        )
+    }
+
+    fun mapToQuickSnapshot(hourlyForecast: HourlyForecast, location: Points) : QuickSnapshot {
+        val currentPeriod = hourlyForecast.hourlyForecastProperties?.periods?.get(0)
+        return QuickSnapshot(
+            locationCity = location.properties?.relativeLocation?.properties?.city ?: "Error",
+            locationState = location.properties?.relativeLocation?.properties?.state ?: "Error",
+            currentTemp = currentPeriod?.temperature ?: 0,
+            probabilityOfPrecipitation = currentPeriod?.probabilityOfPrecipitation?.probability ?: 0,
+            windSpeed = currentPeriod?.windSpeed ?: "Error",
+            windDirection = currentPeriod?.windDirection ?: "Error",
+            shortForecast =  currentPeriod?.shortForecast ?: "Error",
+            weatherImage = WeatherImageMapper().map(currentPeriod?.shortForecast, currentPeriod?.isDaytime)
         )
     }
 

@@ -28,7 +28,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.pineapple.weather.data.viewmodels.Gridpoints
 import com.pineapple.weather.data.viewmodels.LocationViewModel
+import com.pineapple.weather.data.viewmodels.SnapshotViewModel
 import com.pineapple.weather.ui.WeatherScaffold
 import com.pineapple.weather.ui.components.Locations
 import com.pineapple.weather.ui.components.Profile
@@ -41,8 +43,8 @@ import com.pineapple.weather.ui.theme.WeatherTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherApp(){
-    val navController = rememberNavController()
-    val backStackEntry = navController.currentBackStackEntryAsState()
+    // val navController = rememberNavController()
+    // val backStackEntry = navController.currentBackStackEntryAsState()
     WeatherTheme {
         Surface(
             modifier = Modifier
@@ -57,26 +59,39 @@ fun WeatherApp(){
                 ),
             color = Color.Transparent
         ) {
-            val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
-            LocationScreen(locationViewModel.locationUiState)
+            val mockList = listOf(
+                Gridpoints(47.5301, -122.0326),
+                Gridpoints(47.6580, -117.4235),
+                Gridpoints(47.5301, -122.0326),
+                Gridpoints(44.5301, -120.0326),
+                Gridpoints(44.5301, -120.0326),
+                Gridpoints(44.5301, -120.0326)
+            )
+
+            val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.provideFactory(
+                Gridpoints(47.5301, -122.0326)
+            ))
+
+            val snapshotViewModel: SnapshotViewModel = viewModel(factory = SnapshotViewModel.provideFactory(mockList))
+            LocationScreen(locationViewModel.locationUiState, snapshotViewModel.snapshotUiState)
         }
     }
 }
 
-@Composable
-private fun NavGraph(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    startDestination: String = Locations.route,
-){
-
-    val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
-    NavHost(navController = navController, startDestination = startDestination){
-        composable(route = Locations.route){
-            LocationScreen(locationViewModel.locationUiState)
-        }
-        composable(route = Profile.route){
-            ProfileScreen(locationViewModel.locationUiState)
-        }
-    }
-}
+//@Composable
+//private fun NavGraph(
+//    modifier: Modifier = Modifier,
+//    navController: NavHostController,
+//    startDestination: String = Locations.route,
+//){
+//
+//    val locationViewModel: LocationViewModel = viewModel(factory = LocationViewModel.Factory)
+//    NavHost(navController = navController, startDestination = startDestination){
+//        composable(route = Locations.route){
+//            LocationScreen(locationViewModel.locationUiState)
+//        }
+//        composable(route = Profile.route){
+//            ProfileScreen(locationViewModel.locationUiState)
+//        }
+//    }
+//}
